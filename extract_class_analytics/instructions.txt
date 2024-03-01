@@ -1,0 +1,11 @@
+Take note that this instructions assumes you know unix terminal commands, and that you have python installed on your system.
+
+1. ensure that your spreadsheet file from insendi is in the same folder as the python script and class list file.
+2. open a terminal and move into the directory where you have files saved.
+3. if you are not runing anaconda, please run this in the terminal "pip install -r requirement.txt" without the quotation of course :) .
+4. now run in the terminal "python class_analytics.py [insendi_file] [class_list_file].
+5. sit back and enjoy :) .
+
+For any further clarification(s), reach me on 
+email: ayanful@iiafrica.org
+telephone: +233247289712
