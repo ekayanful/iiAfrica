@@ -26,10 +26,10 @@ def load_data(insendi_file, class_list):
 def extract_sections(analytics):
     section = str(input("Do you want extract for certain sections? (y/n): \n"))
     if section == 'y':
-        day = str(input("Enter day(s) that you want to extract (e.g. 1,5 means day 1 to day 5): \n"))
+        day = str(input("\nEnter day(s) that you want to extract (e.g. 1,5 means day 1 to day 5): \n"))
         if len(day) == 1:
             m, n = int(day), int(day)
-        elif len(day) == 2:
+        elif len(day) == 3:
             m, n = map(int, day.split(','))
         else:
             sys.exit("Input must be 2 digits seperated by commas or 1 digit")
@@ -62,8 +62,8 @@ def main():
         class_list = f"./class_lists/{temp}_list.csv"
         
     elif user == 'n':
-        insendi_file_list = str(input("Enter insendi list csv file name without .csv: \n"))
-        class_ = sys.argv[2]#str(input("Enter class list name (AWB Beta Class or HENKEL Gamma Class etc): \n"))
+        insendi_file_list = str(input("\nEnter insendi list csv file name without .csv: \n"))
+        class_ = sys.argv[2]
         class_name = " ".join(class_.split('_'))
         extract_class_list(f"./class_lists/{insendi_file_list}.csv", class_name)
         temp = '_'.join(class_name.split(' '))
@@ -72,13 +72,13 @@ def main():
     else:
         sys.exit("Input must be y or n")
     
-    print("Loading data...\n")
+    print("\nLoading data...\n")
     analytics, classList = load_data(insendi_file, class_list)
     print("Data loaded.\n")
     
     print("Extracting section analytics...\n")
     columns_extract = extract_sections(analytics)
-    print("Section analytics extracted.\n")
+    print("\nSection analytics extracted.\n")
         
     print("Extracting class analytics...\n")
     merged = pd.merge(analytics, classList, left_on='Student', right_on='Students', how='inner')
