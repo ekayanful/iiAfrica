@@ -109,7 +109,7 @@ def main():
         
         print("Extracting class analytics...\n")
         merged = pd.merge(analytics, classList, left_on='Student', right_on='Students', how='inner')
-        merged[columns_extract].to_csv(f'./analytics/class_analytics_{base_name}.csv', index=False)
+        merged[columns_extract].to_csv(f'./analytics/{base_name}.csv', index=False)
         print("Class analytics extracted.\n")
     
     print("Extracting combined analytics...\n")
