@@ -1,5 +1,5 @@
 import pandas as pd
-import sys
+import sys, os
 
 def extract_class_list(insendi_file, class_name):
     class_list = pd.read_csv(insendi_file)
@@ -23,8 +23,27 @@ def load_data(insendi_file, class_list):
         sys.exit("Class list file format must be txt, csv, or xlsx")
     return analytics, classList
 
-def extract_sections(analytics):
-    section = str(input("Do you want extract for certain sections? (y/n): \n"))
+def extract_combined_analytics(dir_name, class_list):
+    master = pd.read_csv(class_list)
+    for file_name in os.listdir(dir_name):
+        if file_name.startswith('.'):
+            continue
+        file_path = f'./{dir_name}/{file_name}'
+        
+        file_data, _ = load_data(file_path, class_list)
+        
+        base_name = os.path.splitext(file_name)[0]
+        base_name = ' '.join(base_name.split('_')).title()
+        
+        file_data = file_data[file_data.columns[[2,-1]]]
+        file_data.columns=["Students", base_name]
+        
+        merged = pd.merge(master, file_data, on='Students', how='inner')
+        master = merged
+    print("Combined analytics extracted.")    
+    master.to_csv(f'./analytics/master.csv', index=False)
+
+def extract_sections(analytics, section):
     if section == 'y':
         day = str(input("\nEnter day(s) that you want to extract (e.g. 1,5 means day 1 to day 5): \n"))
         if len(day) == 1:
@@ -53,11 +72,11 @@ def extract_sections(analytics):
 
 def main():
     if len(sys.argv) != 3:
-        sys.exit("Usage: python [analytics.py] [insendi csv file] [class_name]")
+        sys.exit("Usage: python [analytics.py] [dir containing insendi files] [class_name]")
     
     user = str(input("Do you have a class list? (y/n): \n"))
     if user == 'y':
-        insendi_file = sys.argv[1]
+        insendi_dir = sys.argv[1]
         temp = sys.argv[2]
         class_list = f"./class_lists/{temp}_list.csv"
         
@@ -68,22 +87,33 @@ def main():
         extract_class_list(f"./class_lists/{insendi_file_list}.csv", class_name)
         temp = '_'.join(class_name.split(' '))
         class_list = f"./class_lists/{temp}_list.csv"
-        insendi_file = sys.argv[1]
+        insendi_dir = sys.argv[1]
     else:
         sys.exit("Input must be y or n")
     
-    print("\nLoading data...\n")
-    analytics, classList = load_data(insendi_file, class_list)
-    print("Data loaded.\n")
+    section = str(input("Do you want extract for certain sections? (y/n): \n"))
+    for i in os.listdir(insendi_dir):
+        if i.startswith('.'):
+            continue
+        file_path = f'./{insendi_dir}/{i}'
+        print("\nLoading data...\n")
+        analytics, classList = load_data(file_path, class_list)
+        print("Data loaded.\n")
     
-    print("Extracting section analytics...\n")
-    columns_extract = extract_sections(analytics)
-    print("\nSection analytics extracted.\n")
+        print("Extracting section analytics...\n")
+        columns_extract = extract_sections(analytics, section)
+        print("\nSection analytics extracted.\n")
         
-    print("Extracting class analytics...\n")
-    merged = pd.merge(analytics, classList, left_on='Student', right_on='Students', how='inner')
-    merged[columns_extract].to_csv('./analytics/class_analytics.csv', index=False)
-    print("Class analytics extracted.\n")
+        base_name = os.path.splitext(i)[0]
+        #base_name = ' '.join(base_name.split('_')).title()
+        
+        print("Extracting class analytics...\n")
+        merged = pd.merge(analytics, classList, left_on='Student', right_on='Students', how='inner')
+        merged[columns_extract].to_csv(f'./analytics/class_analytics_{base_name}.csv', index=False)
+        print("Class analytics extracted.\n")
+    
+    print("Extracting combined analytics...\n")
+    extract_combined_analytics(insendi_dir, class_list)
     
 if __name__ == "__main__":
     main()
