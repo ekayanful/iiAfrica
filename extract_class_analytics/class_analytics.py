@@ -40,7 +40,9 @@ def extract_combined_analytics(dir_name, class_list):
         
         merged = pd.merge(master, file_data, on='Students', how='inner')
         master = merged
-    print("Combined analytics extracted.")    
+    master = master.fillna(0)
+    master['Total Averages'] = master[master.columns[1:]].mean(axis=1)
+    print("Combined analytics extracted.")  
     master.to_csv(f'./analytics/master.csv', index=False)
 
 def extract_sections(analytics, section):
